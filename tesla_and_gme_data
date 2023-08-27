@@ -1,0 +1,965 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "95297832-e799-4e33-931a-39f1b8620d58",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: yfinance in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (0.2.28)\n",
+      "Requirement already satisfied: pandas>=1.3.0 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (1.3.5)\n",
+      "Requirement already satisfied: numpy>=1.16.5 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (1.21.6)\n",
+      "Requirement already satisfied: requests>=2.31 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (2.31.0)\n",
+      "Requirement already satisfied: multitasking>=0.0.7 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (0.0.11)\n",
+      "Requirement already satisfied: lxml>=4.9.1 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (4.9.2)\n",
+      "Requirement already satisfied: appdirs>=1.4.4 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (1.4.4)\n",
+      "Requirement already satisfied: pytz>=2022.5 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (2023.3)\n",
+      "Requirement already satisfied: frozendict>=2.3.4 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (2.3.8)\n",
+      "Requirement already satisfied: beautifulsoup4>=4.11.1 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (4.11.1)\n",
+      "Requirement already satisfied: html5lib>=1.1 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from yfinance) (1.1)\n",
+      "Requirement already satisfied: soupsieve>1.2 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from beautifulsoup4>=4.11.1->yfinance) (2.3.2.post1)\n",
+      "Requirement already satisfied: six>=1.9 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from html5lib>=1.1->yfinance) (1.16.0)\n",
+      "Requirement already satisfied: webencodings in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from html5lib>=1.1->yfinance) (0.5.1)\n",
+      "Requirement already satisfied: python-dateutil>=2.7.3 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from pandas>=1.3.0->yfinance) (2.8.2)\n",
+      "Requirement already satisfied: charset-normalizer<4,>=2 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from requests>=2.31->yfinance) (3.1.0)\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from requests>=2.31->yfinance) (3.4)\n",
+      "Requirement already satisfied: urllib3<3,>=1.21.1 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from requests>=2.31->yfinance) (1.26.15)\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from requests>=2.31->yfinance) (2023.5.7)\n",
+      "Collecting bs4\n",
+      "  Downloading bs4-0.0.1.tar.gz (1.1 kB)\n",
+      "  Preparing metadata (setup.py) ... \u001b[?25ldone\n",
+      "\u001b[?25hRequirement already satisfied: beautifulsoup4 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from bs4) (4.11.1)\n",
+      "Requirement already satisfied: soupsieve>1.2 in /home/jupyterlab/conda/envs/python/lib/python3.7/site-packages (from beautifulsoup4->bs4) (2.3.2.post1)\n",
+      "Building wheels for collected packages: bs4\n",
+      "  Building wheel for bs4 (setup.py) ... \u001b[?25ldone\n",
+      "\u001b[?25h  Created wheel for bs4: filename=bs4-0.0.1-py3-none-any.whl size=1257 sha256=a0f5dac7e6d58d2d1597416c815e7d6160f72c2b6256e18b3b1d8d99d6fee45b\n",
+      "  Stored in directory: /home/jupyterlab/.cache/pip/wheels/0a/9e/ba/20e5bbc1afef3a491f0b3bb74d508f99403aabe76eda2167ca\n",
+      "Successfully built bs4\n",
+      "Installing collected packages: bs4\n",
+      "Successfully installed bs4-0.0.1\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install yfinance\n",
+    "!pip install bs4"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "4b17cdcc-44a5-4e0e-8c62-3c7e28ba1fe9",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "import yfinance as yf\n",
+    "import pandas as pd\n",
+    "import requests\n",
+    "from bs4 import BeautifulSoup\n",
+    "import plotly.graph_objects as go\n",
+    "from plotly.subplots import make_subplots"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "5647811a-74ab-43b4-b85f-19eafff22b8e",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "def make_graph(stock_data, revenue_data, stock):\n",
+    "    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=(\"Historical Share Price\", \"Historical Revenue\"), vertical_spacing = .3)\n",
+    "    stock_data_specific = stock_data[stock_data.Date <= '2021--06-14']\n",
+    "    revenue_data_specific = revenue_data[revenue_data.Date <= '2021-04-30']\n",
+    "    fig.add_trace(go.Scatter(x=pd.to_datetime(stock_data_specific.Date, infer_datetime_format=True), y=stock_data_specific.Close.astype(\"float\"), name=\"Share Price\"), row=1, col=1)\n",
+    "    fig.add_trace(go.Scatter(x=pd.to_datetime(revenue_data_specific.Date, infer_datetime_format=True), y=revenue_data_specific.Revenue.astype(\"float\"), name=\"Revenue\"), row=2, col=1)\n",
+    "    fig.update_xaxes(title_text=\"Date\", row=1, col=1)\n",
+    "    fig.update_xaxes(title_text=\"Date\", row=2, col=1)\n",
+    "    fig.update_yaxes(title_text=\"Price ($US)\", row=1, col=1)\n",
+    "    fig.update_yaxes(title_text=\"Revenue ($US Millions)\", row=2, col=1)\n",
+    "    fig.update_layout(showlegend=False,\n",
+    "    height=900,\n",
+    "    title=stock,\n",
+    "    xaxis_rangeslider_visible=True)\n",
+    "    fig.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9243da04-cebf-406a-bb10-4f0eb52d4327",
+   "metadata": {},
+   "source": [
+    "## Question 1: Use yfinance to Extract Stock Data\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8c0b26e9-e33a-41d7-bee3-7f2cbe93e867",
+   "metadata": {},
+   "source": [
+    "Using the `Ticker` function enter the ticker symbol of the stock we want to extract data on to create a ticker object. The stock is Tesla and its ticker symbol is `TSLA`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "27a2297a-890d-4154-ab89-55c982f6e17a",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "Tesla = yf.Ticker('TSLA')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "97cad6b2-0834-4eff-ad3b-08ce697ac0c6",
+   "metadata": {},
+   "source": [
+    "Using the ticker object and the function `history` extract stock information and save it in a dataframe named `tesla_data`. Set the `period` parameter to `max` so we get information for the maximum amount of time.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "de8ef630-d908-42f4-8eb3-f3055e6d4e99",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "tesla_data = Tesla.history(period=\"max\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "79c31f9b-0787-42c4-a312-3b4b48ac3909",
+   "metadata": {},
+   "source": [
+    "**Reset the index** using the `reset_index(inplace=True)` function on the tesla_data DataFrame and display the first five rows of the `tesla_data` dataframe using the `head` function. Take a screenshot of the results and code from the beginning of Question 1 to the results below.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "9e81a653-c5f2-4fa8-94a7-c21ed49fa26f",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Dividends</th>\n",
+       "      <th>Stock Splits</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2010-06-29 00:00:00-04:00</td>\n",
+       "      <td>1.266667</td>\n",
+       "      <td>1.666667</td>\n",
+       "      <td>1.169333</td>\n",
+       "      <td>1.592667</td>\n",
+       "      <td>281494500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2010-06-30 00:00:00-04:00</td>\n",
+       "      <td>1.719333</td>\n",
+       "      <td>2.028000</td>\n",
+       "      <td>1.553333</td>\n",
+       "      <td>1.588667</td>\n",
+       "      <td>257806500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2010-07-01 00:00:00-04:00</td>\n",
+       "      <td>1.666667</td>\n",
+       "      <td>1.728000</td>\n",
+       "      <td>1.351333</td>\n",
+       "      <td>1.464000</td>\n",
+       "      <td>123282000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2010-07-02 00:00:00-04:00</td>\n",
+       "      <td>1.533333</td>\n",
+       "      <td>1.540000</td>\n",
+       "      <td>1.247333</td>\n",
+       "      <td>1.280000</td>\n",
+       "      <td>77097000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2010-07-06 00:00:00-04:00</td>\n",
+       "      <td>1.333333</td>\n",
+       "      <td>1.333333</td>\n",
+       "      <td>1.055333</td>\n",
+       "      <td>1.074000</td>\n",
+       "      <td>103003500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                       Date      Open      High       Low     Close  \\\n",
+       "0 2010-06-29 00:00:00-04:00  1.266667  1.666667  1.169333  1.592667   \n",
+       "1 2010-06-30 00:00:00-04:00  1.719333  2.028000  1.553333  1.588667   \n",
+       "2 2010-07-01 00:00:00-04:00  1.666667  1.728000  1.351333  1.464000   \n",
+       "3 2010-07-02 00:00:00-04:00  1.533333  1.540000  1.247333  1.280000   \n",
+       "4 2010-07-06 00:00:00-04:00  1.333333  1.333333  1.055333  1.074000   \n",
+       "\n",
+       "      Volume  Dividends  Stock Splits  \n",
+       "0  281494500        0.0           0.0  \n",
+       "1  257806500        0.0           0.0  \n",
+       "2  123282000        0.0           0.0  \n",
+       "3   77097000        0.0           0.0  \n",
+       "4  103003500        0.0           0.0  "
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tesla_data.reset_index(inplace = True)\n",
+    "tesla_data.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cc9ab4fd-abfb-4a8c-924f-0f7a513e6cd3",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Question 2: Use Webscraping to Extract Tesla Revenue Data\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b977bf07-51a4-4b55-b987-9b7c6ff593b4",
+   "metadata": {},
+   "source": [
+    "Use the `requests` library to download the webpage https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm Save the text of the response as a variable named `html_data`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "356a9696-e92a-4c51-8bd4-ddf13946c320",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "url=\"https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm\"\n",
+    "html_data = requests.get(url).text"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8f19095c-046a-44fd-8391-7f5b6c96a2ac",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "\n",
+    "\n",
+    "Parse the html data using `beautiful_soup`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "673dac03-b3b0-499e-b380-68b69006c241",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<title>Tesla Revenue 2010-2022 | TSLA | MacroTrends</title>]"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "soup = BeautifulSoup(html_data, \"html.parser\")\n",
+    "soup.find_all('title')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c7dc8ac8-af74-45ab-8ca8-8136d208eab9",
+   "metadata": {},
+   "source": [
+    "Using `BeautifulSoup` or the `read_html` function extract the table with `Tesla Revenue` and store it into a dataframe named `tesla_revenue`. The dataframe should have columns `Date` and `Revenue`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "3b3bce49-c08e-4b87-bb80-20562bce8742",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "tesla_revenue = pd.DataFrame(columns = ['Date','Revenue'])\n",
+    "for row in soup.find_all(\"tbody\")[1].find_all(\"tr\"):\n",
+    "    col = row.find_all(\"td\")\n",
+    "    date = col[0].text\n",
+    "    revenue = col[1].text.replace(\"$\",\" \").replace(\",\",\" \")\n",
+    "\n",
+    "    tesla_revenue = tesla_revenue.append({\"Date\":date,\"Revenue\":revenue}, ignore_index = True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "id": "955cbbda-4901-4056-9d30-6453d9cd9ead",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "tesla_revenue.dropna(inplace=True)\n",
+    "\n",
+    "tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != \"\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "474f8d86-7cf0-41f1-ad12-725fbb207eb7",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Revenue</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>48</th>\n",
+       "      <td>2010-09-30</td>\n",
+       "      <td>31</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>49</th>\n",
+       "      <td>2010-06-30</td>\n",
+       "      <td>28</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50</th>\n",
+       "      <td>2010-03-31</td>\n",
+       "      <td>21</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>52</th>\n",
+       "      <td>2009-09-30</td>\n",
+       "      <td>46</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>53</th>\n",
+       "      <td>2009-06-30</td>\n",
+       "      <td>27</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "          Date Revenue\n",
+       "48  2010-09-30      31\n",
+       "49  2010-06-30      28\n",
+       "50  2010-03-31      21\n",
+       "52  2009-09-30      46\n",
+       "53  2009-06-30      27"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tesla_revenue.tail()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "61f94b1a-4abd-452f-b370-1a668105fa9e",
+   "metadata": {},
+   "source": [
+    "## Question 3: Use yfinance to Extract Stock Data\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8d349e94-ef58-4fb5-b73d-e16d3ea1927e",
+   "metadata": {},
+   "source": [
+    "Using the `Ticker` function enter the ticker symbol of the stock we want to extract data on to create a ticker object. The stock is GameStop and its ticker symbol is `GME`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "id": "763db42f-9c82-4cf8-8814-e1bf90fd543c",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "GameStop = yf.Ticker(\"GME\")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b5d03e37-1c48-4ca4-b739-8b12ea85d4c5",
+   "metadata": {},
+   "source": [
+    "Using the ticker object and the function `history` extract stock information and save it in a dataframe named `gme_data`. Set the `period` parameter to `max` so we get information for the maximum amount of time.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "4b393e97-ea37-4fcd-9d3c-311073e9cb16",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "gme_data = GameStop.history(period = \"max\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7be730db-bdee-419d-9c48-3354230d2103",
+   "metadata": {},
+   "source": [
+    "**Reset the index** using the `reset_index(inplace=True)` function on the gme_data DataFrame and display the first five rows of the `gme_data` dataframe using the `head` function. Take a screenshot of the results and code from the beginning of Question 3 to the results below.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "399c5988-e114-43df-8fe3-4af077cb012b",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Dividends</th>\n",
+       "      <th>Stock Splits</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2002-02-13 00:00:00-05:00</td>\n",
+       "      <td>1.620128</td>\n",
+       "      <td>1.693350</td>\n",
+       "      <td>1.603296</td>\n",
+       "      <td>1.691667</td>\n",
+       "      <td>76216000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2002-02-14 00:00:00-05:00</td>\n",
+       "      <td>1.712707</td>\n",
+       "      <td>1.716074</td>\n",
+       "      <td>1.670626</td>\n",
+       "      <td>1.683250</td>\n",
+       "      <td>11021600</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2002-02-15 00:00:00-05:00</td>\n",
+       "      <td>1.683250</td>\n",
+       "      <td>1.687458</td>\n",
+       "      <td>1.658001</td>\n",
+       "      <td>1.674834</td>\n",
+       "      <td>8389600</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2002-02-19 00:00:00-05:00</td>\n",
+       "      <td>1.666418</td>\n",
+       "      <td>1.666418</td>\n",
+       "      <td>1.578047</td>\n",
+       "      <td>1.607504</td>\n",
+       "      <td>7410400</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2002-02-20 00:00:00-05:00</td>\n",
+       "      <td>1.615920</td>\n",
+       "      <td>1.662209</td>\n",
+       "      <td>1.603295</td>\n",
+       "      <td>1.662209</td>\n",
+       "      <td>6892800</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                       Date      Open      High       Low     Close    Volume  \\\n",
+       "0 2002-02-13 00:00:00-05:00  1.620128  1.693350  1.603296  1.691667  76216000   \n",
+       "1 2002-02-14 00:00:00-05:00  1.712707  1.716074  1.670626  1.683250  11021600   \n",
+       "2 2002-02-15 00:00:00-05:00  1.683250  1.687458  1.658001  1.674834   8389600   \n",
+       "3 2002-02-19 00:00:00-05:00  1.666418  1.666418  1.578047  1.607504   7410400   \n",
+       "4 2002-02-20 00:00:00-05:00  1.615920  1.662209  1.603295  1.662209   6892800   \n",
+       "\n",
+       "   Dividends  Stock Splits  \n",
+       "0        0.0           0.0  \n",
+       "1        0.0           0.0  \n",
+       "2        0.0           0.0  \n",
+       "3        0.0           0.0  \n",
+       "4        0.0           0.0  "
+      ]
+     },
+     "execution_count": 49,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gme_data.reset_index(inplace=True)\n",
+    "gme_data.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f1b421c7-028d-4691-ae4e-a4033a9d8db6",
+   "metadata": {},
+   "source": [
+    "## Question 4: Use Webscraping to Extract GME Revenue Data\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f00ad50a-431b-41ac-9999-ded44d046a96",
+   "metadata": {},
+   "source": [
+    "Use the `requests` library to download the webpage https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/stock.html. Save the text of the response as a variable named `html_data`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "id": "dc07d1b0-7c18-44a1-9a6d-cb8cae113950",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "url = \"https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/stock.html\"\n",
+    "\n",
+    "html_data = requests.get(url).text\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "43e10691-e25e-41b7-b6c1-ab303327c13d",
+   "metadata": {},
+   "source": [
+    "Parse the html data using `beautiful_soup`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "1d74ac4e-0f0e-4aaa-b535-05be08823535",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<title>GameStop Revenue 2006-2020 | GME | MacroTrends</title>]"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "soup = BeautifulSoup(html_data, \"html.parser\")\n",
+    "soup.find_all('title')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b8064248-2059-4fa8-8a8b-3aa6c57f9870",
+   "metadata": {},
+   "source": [
+    "Using `BeautifulSoup` or the `read_html` function extract the table with `GameStop Revenue` and store it into a dataframe named `gme_revenue`. The dataframe should have columns `Date` and `Revenue`. Make sure the comma and dollar sign is removed from the `Revenue` column using a method similar to what you did in Question 2.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "a21a89bb-dd67-43ce-b1fb-b7d5afc699fd",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "gme_revenue = pd.DataFrame(columns = ['Date','Revenue'])\n",
+    "for row in soup.find_all(\"tbody\")[1].find_all(\"tr\"):\n",
+    "    col = row.find_all(\"td\")\n",
+    "    date = col[0].text\n",
+    "    revenue = col[1].text.replace(\"$\",\" \").replace(\",\",\" \")\n",
+    "\n",
+    "    gme_revenue = gme_revenue.append({\"Date\":date,\"Revenue\":revenue}, ignore_index = True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "06607875-d8e4-4ea3-b3bc-bfb67f819a06",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "tesla_revenue.dropna(inplace=True)\n",
+    "\n",
+    "tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != \"\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "c4d5b9e0-ab0e-4c79-974f-0b22a129ccba",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Revenue</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>57</th>\n",
+       "      <td>2006-01-31</td>\n",
+       "      <td>1 667</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>58</th>\n",
+       "      <td>2005-10-31</td>\n",
+       "      <td>534</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>59</th>\n",
+       "      <td>2005-07-31</td>\n",
+       "      <td>416</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>60</th>\n",
+       "      <td>2005-04-30</td>\n",
+       "      <td>475</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>61</th>\n",
+       "      <td>2005-01-31</td>\n",
+       "      <td>709</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "          Date Revenue\n",
+       "57  2006-01-31   1 667\n",
+       "58  2005-10-31     534\n",
+       "59  2005-07-31     416\n",
+       "60  2005-04-30     475\n",
+       "61  2005-01-31     709"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gme_revenue.tail()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fd206ccb-64b2-4e69-9026-a1b999a1a06c",
+   "metadata": {},
+   "source": [
+    "## Question 5: Plot Tesla Stock Graph\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "586201e8-85da-44a2-9055-9bb23abf7620",
+   "metadata": {},
+   "source": [
+    "Use the `make_graph` function to graph the Tesla Stock Data, also provide a title for the graph. The structure to call the `make_graph` function is `make_graph(tesla_data, tesla_revenue, 'Tesla')`. Note the graph will only show data upto June 2021.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "id": "f2fbfe10-a090-4c54-b292-cb630b77573e",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<AxesSubplot:xlabel='Date'>"
+      ]
+     },
+     "execution_count": 63,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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3xbXXnutsFqtQSxZ8PCztQ4/W90L5mdrSLegFBYW4vTp07jkkksAANXV1cjMzMTs2bOxdu1afP/990EuYeAIIXDppZfivvvuQ1RUFIQQiI6ORlVVFYxGI+Li4pp0yjcYDGjbti1GjBiBAQMG4NlnnwVQswV4U1JWVobz589j5MiReP7553Hbbbdhz549ePrppzFixAh88cUXwS5iwJnNZvz222/yEtznz5/Ha6+9hqysLLz77rswGo1BLmHg8bO1jtVq5WerA/v3G8zP1pAJKF999RUAZcV06dIFmZmZeO+99wAAWm1NcadNm4bExESsXr0a1dXVgS9sAEj1YbPZANRsT3333XejT58+iuMlJSXo0KEDAER8X6na74hkx44dKC8vBwC8//77WLNmDcaNG4exY8fiwIEDAS1noKjVR2JiIsxmM/75z3/i0KFDWLVqFT755BOcOHECHTt2xLvvvhux9QGo18nQoUMxfPhw3HPPPRg3bhwyMjKQmZmJ6OhozJ49G3fffTf27NkTrCL73VtvvYW3335bETpycnKa7GerVB8bN24EADRv3hyTJk1q0p+tjnWi0WjkegjqZ2vA2mpc+PLLL0WrVq2ERqMRP/74oxBCyM2ulZWVYtasWaJz587i3LlzQgghjEajEEKI5cuXi2bNmsn3I4W7+rBns9mEEEIMGjRI/POf/1QcizRqdSK9V+m/t912m1i/fr0Qoqb5PjY2VkRFRYlPPvkkOIX2I1f1IdXFO++8IzQajejcubMoKCiQH/f999+Lli1bis2bNwel3P7k6t+N9G+nvLxcHD58WAwZMkS89NJL8uN++eUX0aFDB/HRRx8Fpdz+9MEHH4j09HQxePBg0adPH5GWliZeeOEFIURNt0ZT+2x1Vx8Wi0W+ril9tqrVydy5c4UQNd1cQgT3szWoAeWHH34QV155pXj44YfFuHHjRP/+/Z2uWb9+vRgwYICYOnWqEKLuF+Xbb78V6enpYteuXQEtsz95Uh/2jh07JtLS0sSBAwfkY0eOHBFCqIeacFRfnUjv8+677xZ33XWXGDBggEhLSxPPPfecaN68ueLLKBJ48juyf/9+MXz4cNG9e3eRl5cnHzcajSIhIUF8/PHHgSyy33n672bHjh2iS5cuoqCgQP4csVgsEfl78v7774vevXuLN954QwghxJkzZ8Srr74q4uPj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\n",
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "tesla_data.plot(x=\"Date\", y= \"Open\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c60cd39a-eb91-4f7f-8166-6f5f4d55bf0d",
+   "metadata": {},
+   "source": [
+    "## Question 6: Plot GameStop Stock Graph\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7faa109a-c467-4f8f-9807-49607afaf55c",
+   "metadata": {},
+   "source": [
+    "Use the `make_graph` function to graph the GameStop Stock Data, also provide a title for the graph. The structure to call the `make_graph` function is `make_graph(gme_data, gme_revenue, 'GameStop')`. Note the graph will only show data upto June 2021.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "id": "bf2e5a31-4856-4671-a8ff-2d1aaef75ef7",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not convert string to float: ' 1 021'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "\u001b[0;32m/tmp/ipykernel_2634/1051334688.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mmake_graph\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgme_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgme_revenue\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'GameStop'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m/tmp/ipykernel_2634/2068038883.py\u001b[0m in \u001b[0;36mmake_graph\u001b[0;34m(stock_data, revenue_data, stock)\u001b[0m\n\u001b[1;32m      4\u001b[0m     \u001b[0mrevenue_data_specific\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrevenue_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mrevenue_data\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m \u001b[0;34m<=\u001b[0m \u001b[0;34m'2021-04-30'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mClose\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Share Price\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 6\u001b[0;31m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mRevenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      7\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mupdate_xaxes\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtitle_text\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Date\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      8\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mupdate_xaxes\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtitle_text\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Date\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/generic.py\u001b[0m in \u001b[0;36mastype\u001b[0;34m(self, dtype, copy, errors)\u001b[0m\n\u001b[1;32m   5813\u001b[0m         \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   5814\u001b[0m             \u001b[0;31m# else, only a single dtype is given\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 5815\u001b[0;31m             \u001b[0mnew_data\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_mgr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0merrors\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0merrors\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   5816\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_constructor\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnew_data\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__finalize__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmethod\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"astype\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   5817\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/internals/managers.py\u001b[0m in \u001b[0;36mastype\u001b[0;34m(self, dtype, copy, errors)\u001b[0m\n\u001b[1;32m    416\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    417\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mT\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mbool\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;32mFalse\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0merrors\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mstr\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m\"raise\"\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mT\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 418\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mapply\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"astype\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0merrors\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0merrors\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    419\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    420\u001b[0m     def convert(\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/internals/managers.py\u001b[0m in \u001b[0;36mapply\u001b[0;34m(self, f, align_keys, ignore_failures, **kwargs)\u001b[0m\n\u001b[1;32m    325\u001b[0m                     \u001b[0mapplied\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mb\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mapply\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mf\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    326\u001b[0m                 \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 327\u001b[0;31m                     \u001b[0mapplied\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mgetattr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mb\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    328\u001b[0m             \u001b[0;32mexcept\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mTypeError\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mNotImplementedError\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    329\u001b[0m                 \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mignore_failures\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/internals/blocks.py\u001b[0m in \u001b[0;36mastype\u001b[0;34m(self, dtype, copy, errors)\u001b[0m\n\u001b[1;32m    589\u001b[0m         \u001b[0mvalues\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mvalues\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    590\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 591\u001b[0;31m         \u001b[0mnew_values\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mastype_array_safe\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvalues\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0merrors\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0merrors\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    592\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    593\u001b[0m         \u001b[0mnew_values\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmaybe_coerce_values\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnew_values\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/dtypes/cast.py\u001b[0m in \u001b[0;36mastype_array_safe\u001b[0;34m(values, dtype, copy, errors)\u001b[0m\n\u001b[1;32m   1307\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1308\u001b[0m     \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1309\u001b[0;31m         \u001b[0mnew_values\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mastype_array\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvalues\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1310\u001b[0m     \u001b[0;32mexcept\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mValueError\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mTypeError\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1311\u001b[0m         \u001b[0;31m# e.g. astype_nansafe can fail on object-dtype of strings\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/dtypes/cast.py\u001b[0m in \u001b[0;36mastype_array\u001b[0;34m(values, dtype, copy)\u001b[0m\n\u001b[1;32m   1255\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1256\u001b[0m     \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1257\u001b[0;31m         \u001b[0mvalues\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mastype_nansafe\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvalues\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1258\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1259\u001b[0m     \u001b[0;31m# in pandas we don't store numpy str dtypes, so convert to object\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/conda/envs/python/lib/python3.7/site-packages/pandas/core/dtypes/cast.py\u001b[0m in \u001b[0;36mastype_nansafe\u001b[0;34m(arr, dtype, copy, skipna)\u001b[0m\n\u001b[1;32m   1199\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0mcopy\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0mis_object_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0marr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0mis_object_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1200\u001b[0m         \u001b[0;31m# Explicit copy, or required since NumPy can't view from / to object.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1201\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0marr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1202\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1203\u001b[0m     \u001b[0;32mreturn\u001b[0m \u001b[0marr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcopy\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcopy\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mValueError\u001b[0m: could not convert string to float: ' 1 021'"
+     ]
+    }
+   ],
+   "source": [
+    "make_graph(gme_data, gme_revenue, 'GameStop')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ad719345-2743-40b9-84f7-0ed42bbc1935",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b0f9f818-ec7d-41d7-8d45-ab16311ad778",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python",
+   "language": "python",
+   "name": "conda-env-python-py"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
